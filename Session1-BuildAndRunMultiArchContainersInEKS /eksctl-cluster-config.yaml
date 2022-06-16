@@ -1,0 +1,25 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: cwdd-eks-cluster
+  region: us-east-1
+
+vpc:
+  subnets:
+    private:
+      us-east-1b: { id: subnet-0b25d03c7bd0cb37a }
+      us-east-1a: { id: subnet-0f07bd76aad0e6630 }
+
+
+nodeGroups:
+  - name: cwdd-eks-ng-1-X86
+    labels: { arch: x86 }
+    instanceType: t2.micro
+    desiredCapacity: 1
+    privateNetworking: true
+  - name: cwdd-eks-ng-2-ARM64
+    labels: { arch: arm64 }
+    instanceType: t4g.small
+    desiredCapacity: 1
+    privateNetworking: true

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: webapi
 spec:
-  replicas: 4
+  replicas: 3
   selector:
     matchLabels:
       app: webapi
@@ -17,9 +17,9 @@ spec:
     spec:
       containers:
       - name: webapi
-        image: cloudwithdd/webapi:buildx-latest
+        image: cloudwithdd/webapi:v0.5
         ports:
-        - containerPort: 80
+        - containerPort: 8080
 
 ---
 
@@ -29,9 +29,7 @@ metadata:
   name: webapi-svc
 spec:
   ports:
-  - port: 80
-    targetPort: 80
-    protocol: TCP
+  - port: 8080
   selector:
     app: webapi
 
@@ -41,11 +39,16 @@ kind: Ingress
 metadata:
   name: webapi-ingress
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
   - http:
       paths:
-        - backend:
-            serviceName: nginx-svc
-            servicePort: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: webapi-svc
+            port:
+              number: 8080
+

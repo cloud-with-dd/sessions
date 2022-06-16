@@ -1,6 +1,13 @@
+# Create cluster using eksctl
+eksctl create cluster -f ./eksctl-cluster-config.yaml
+
+
+# Build multi-arch container image
 docker buildx build \
 --push \
 --platform "linux/arm/v7,linux/arm64/v8,linux/amd64" \
---tag "cloudwithdd/webapi:0.3" .
+--tag "cloudwithdd/webapi:v0.4" .
 
+
+# ELB DNS
 URL: a3952071da2c141e8aef7240371dcdb7-0f3cdce72d743510.elb.us-east-1.amazonaws.com

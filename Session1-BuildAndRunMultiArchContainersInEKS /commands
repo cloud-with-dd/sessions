@@ -2,11 +2,15 @@
 eksctl create cluster -f ./eksctl-cluster-config.yaml
 
 
+# Install nginx ingress controller to provision NLB
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/aws/deploy.yaml
+
+
 # Build multi-arch container image
 docker buildx build \
 --push \
 --platform "linux/arm/v7,linux/arm64/v8,linux/amd64" \
---tag "cloudwithdd/webapi:v0.4" .
+--tag "cloudwithdd/webapi:v0.5" .
 
 
 # ELB DNS

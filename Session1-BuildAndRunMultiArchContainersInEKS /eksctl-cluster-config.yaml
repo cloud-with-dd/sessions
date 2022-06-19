@@ -11,8 +11,8 @@ privateCluster:
 vpc:
   subnets:
     private:
-      us-east-1b: { id: subnet-008df4645bcb7fc91 }
-      us-east-1a: { id: subnet-0f34d43cdf920ff72 }
+      us-east-1a: { id: subnet-008df4645bcb7fc91 }
+      us-east-1b: { id: subnet-0f34d43cdf920ff72 }
 
 nodeGroups:
   - name: cwdd-eks-ng-1-X86

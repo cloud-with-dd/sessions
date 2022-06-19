@@ -5,9 +5,6 @@ metadata:
   name: cwdd-eks-cluster
   region: us-east-1
 
-privateCluster:
-  enabled: true
-
 vpc:
   subnets:
     private:

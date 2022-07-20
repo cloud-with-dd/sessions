@@ -1,0 +1,56 @@
+title: Is application availability impacted by loss of a worker node in an EKS cluster
+description: One or more worker nodes may get scaled in OR may get terminated. Pods should be scheduled in available worker nodes thus ensuring application as whole continues to respond to requests
+contributions:
+  resiliency: high
+  security: none
+  performance: medium
+  cost: none
+tags:
+  - kubernetes
+  - eks
+  - pod
+  - deployment
+  - ec2
+steady-state-hypothesis:
+  title: EC2 Instances are running and servicing requests
+  probes:
+    - name: count-instances
+      type: probe
+      tolerance: 2
+      provider:
+        type: python
+        func: count_instances
+        module: chaosaws.ec2.probes
+        arguments:
+          filters:
+            [
+              {
+                "Name": "tag:Name",
+                "Values": ["rnd-eks-cluster-rnd-eks-ng-1-x86-Node"],
+              },
+            ]
+    - type: probe
+      name: app-responds-to-requests
+      tolerance: 200
+      provider:
+        type: http
+        timeout: 10
+        verify_tls: false
+        url: https://www.google.com
+method:
+  - type: action
+    name: stop-ec2-instance
+    provider:
+      type: python
+      module: chaosaws.ec2.actions
+      func: stop_instance
+      arguments:
+        filters:
+          [
+            {
+              "Name": "tag:Name",
+              "Values": ["rnd-eks-cluster-rnd-eks-ng-1-x86-Node"],
+            },
+          ]
+    pauses:
+      after: 400

@@ -1,0 +1,74 @@
+version: 1.0.0
+title: Is application availability impacted by loss of a pod running front-end?
+description: Deleted pod should be replaced with new one
+contributions:
+  resiliency: high
+  security: none
+  performance: medium
+  cost: none
+tags:
+  - kubernetes
+  - eks
+  - pod
+  - deployment
+
+steady-state-hypothesis:
+  title: Pods are running and servicing requests
+  probes:
+    - name: pod-exists
+      type: probe
+      tolerance: 2
+      provider:
+        type: python
+        func: count_pods
+        module: chaosk8s.pod.probes
+        arguments:
+          label_selector: "app=react-web-app"
+          ns: webapp
+    - name: pod-in-running-phase
+      type: probe
+      tolerance: true
+      provider:
+        type: python
+        func: pods_in_phase
+        module: chaosk8s.pod.probes
+        arguments:
+          label_selector: "app=react-web-app"
+          ns: webapp
+          phase: Running
+    - name: pod-in-ready-state
+      type: probe
+      tolerance: true
+      provider:
+        type: python
+        func: pods_in_conditions
+        module: chaosk8s.pod.probes
+        arguments:
+          label_selector: "app=react-web-app"
+          ns: webapp
+          conditions:
+            - type: Ready
+              status: "True"
+    - type: probe
+      name: app-responds-to-requests
+      tolerance: 200
+      provider:
+        type: http
+        timeout: 10
+        verify_tls: false
+        url: https://
+method:
+  - type: action
+    name: terminate-app-pod
+    provider:
+      type: python
+      module: chaosk8s.pod.actions
+      func: terminate_pods
+      arguments:
+        label_selector: "app=react-web-app"
+        ns: webapp
+        rand: true
+
+    pauses:
+      after: 200 # number of seconds to wait before starting probes
+
